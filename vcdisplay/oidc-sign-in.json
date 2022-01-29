@@ -1,0 +1,31 @@
+{
+    "default": {
+      "locale": "en-US",
+      "card": {
+        "title": "Arinco Employee",
+        "issuedBy": " ",
+        "backgroundColor": "#001A31",
+        "textColor": "#FFFFFF",
+        "logo": {
+          "uri": "https://shdsydaadvcstg.blob.core.windows.net/aad-vc-logos/Logo-SymbolAndText-WhiteOnTransparent-Small.png",
+          "description": "Arinco Australia Logo"
+        },
+        "description": "This employee card is issued to employees and directors of Arinco Australia"
+      },
+      "consent": {
+        "title": "Do you want to get your digital employee card from Arinco Demo?",
+        "instructions": "Please log in with your Arinco Demo account to receive your employee card."
+      },
+      "claims": {
+        "vc.credentialSubject.firstName": {
+          "type": "String",
+          "label": "First name"
+        },
+        "vc.credentialSubject.lastName": {
+          "type": "String",
+          "label": "Last name"
+        }
+      }
+    }
+  }
+  

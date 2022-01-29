@@ -1,0 +1,20 @@
+{
+    "attestations": {
+      "idTokens": [
+        {
+          "mapping": {
+            "firstName": { "claim": "given_name" },
+            "lastName": { "claim": "family_name" }
+          },
+          "configuration": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0/.well-known/openid-configuration",
+          "client_id": "00000000-0000-0000-0000-000000000000",
+          "redirect_uri": "vcclient://openid/",
+          "scope": "openid profile"
+        }
+      ]
+    },
+    "validityInterval": 2592000,
+    "vc": {
+      "type": ["EmployeeVC"]
+    }
+  }  

@@ -1,0 +1,59 @@
+name: 3 - VC Demo - Upload Azure AD VC Files (Rules, Display & Image Files)
+# on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - vcrules/*
+    - vcimages/*
+    - vcdisplay/*
+    - ./.github/variables/global.env
+jobs:
+  Deploy-Supporting-Azure-Resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Configure environment variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/*
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Upload Rule Files (AzCLI)
+        run: |
+          FILES="./vcrules/*.json"
+          for f in $FILES 
+          do
+            echo "Processing $f file..."
+            az storage blob upload --account-name $storage_name --container-name vc-rule-files --file $f --name $(basename $f)
+          done
+      
+      - name: Upload Display Files (AzCLI)
+        run: |
+          FILES="./vcdisplay/*.json"
+          for f in $FILES 
+          do
+            echo "Processing $f file..."
+            az storage blob upload --account-name $storage_name --container-name vc-display-files --file $f --name $(basename $f)
+          done
+      
+      - name: Upload Image Files (AzCLI)
+        run: |
+          FILES="./vcimages/*"
+          for f in $FILES 
+          do
+            echo "Processing $f file..."
+            az storage blob upload --account-name $storage_name --container-name vc-general-files --file $f --name $(basename $f)
+          done
+ 

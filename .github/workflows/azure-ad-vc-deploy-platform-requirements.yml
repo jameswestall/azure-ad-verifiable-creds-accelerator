@@ -1,0 +1,44 @@
+name: 1 - VC Demo - Build & Deploy Initial Resources
+# on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - terraform/*
+    - ./.github/variables/global.env
+jobs:
+  Deploy-Supporting-Azure-Resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Add terraform to the runner
+        uses: hashicorp/setup-terraform@v1
+      - name: Execute terraform -version
+        run: terraform -v
+
+      - name: Configure environment variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/*
+
+      - name: Apply terraform code
+        env: 
+          ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+          AZURE_SERVICE_PRINCIPAL_CLIENT_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_CLIENT_ID }}
+          AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET: ${{ secrets.AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET }}
+          AZURE_SERVICE_PRINCIPAL_SUBSCRIPTION_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_SUBSCRIPTION_ID }}
+          AZURE_SERVICE_PRINCIPAL_TENANT_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_TENANT_ID }}
+        run: |
+          cd ${{ github.workspace }}/terraform
+          terraform init -backend-config="storage_account_name=$backend_storage_account_name" -backend-config="container_name=$backend_container_name" -backend-config="key=$backend_key" -backend-config="access_key=$ARM_ACCESS_KEY"
+
+          terraform plan -var="storage_name=$storage_name" -var="admin_object_id=$vc_admin_object_id" -var="tenant_id=$AZURE_SERVICE_PRINCIPAL_TENANT_ID" -var="subscription_id=$AZURE_SERVICE_PRINCIPAL_SUBSCRIPTION_ID" -var="client_id=$AZURE_SERVICE_PRINCIPAL_CLIENT_ID" -var="client_secret=$AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET" -var="acr_name=$acr_name" -out=vcplan
+
+          terraform apply "vcplan"
+          
+      - run: echo "This job's status is ${{ job.status }}."

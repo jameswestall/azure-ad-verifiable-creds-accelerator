@@ -1,0 +1,61 @@
+name: 2 - VC Demo - Deploy Well Known (Domain Verification)
+# on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - wellknown/*
+    - ./.github/variables/global.env
+jobs:
+  Build-VC-WellKnown-Container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Configure environment variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/*
+      
+      - name: Login to Azure
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build well known container
+        run: |
+          cd ${{ github.workspace }}/wellknown
+          az acr login --name $acr_name
+          docker build . -t $acr_name.azurecr.io/containers/$wellknown_container_name:$wellknown_container_version
+          docker push $acr_name.azurecr.io/containers/$wellknown_container_name:$wellknown_container_version 
+
+
+  Deploy-VC-WellKnown-Containers:
+    runs-on: ubuntu-latest
+    needs: Build-VC-WellKnown-Container
+    steps:
+      - name: "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Configure environment variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/*
+      
+      - name: Login to Azure
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy well known container
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          AZURE_SERVICE_PRINCIPAL_CLIENT_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_CLIENT_ID }}
+          AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET: ${{ secrets.AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET }}
+        run: |
+          az container create --resource-group "$vc_shared_rgp" --name "$wellknown_container_name" --image  "$acr_name.azurecr.io/containers/$wellknown_container_name:$wellknown_container_version" --environment-variables dnsCname="$wellknown_cname" aciHostname="$wellknown_container_name.australiaeast.azurecontainer.io" adminEmail="$ADMIN_EMAIL" --registry-login-server "$acr_name.azurecr.io" --registry-username "$AZURE_SERVICE_PRINCIPAL_CLIENT_ID" --registry-password "$AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET" --dns-name-label $wellknown_container_name --ports 80 443 --query ipAddress.fqdn

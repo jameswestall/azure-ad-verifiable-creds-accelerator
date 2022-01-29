@@ -1,0 +1,25 @@
+name: 3 - VC Demo - Build & Deploy .NET Sample 
+# on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - src-asp-net/*
+    - ./.github/variables/global.env
+jobs:
+  Deploy-Supporting-Azure-Resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Configure environment variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/*
+          
+      - run: echo "This job's status is ${{ job.status }}."

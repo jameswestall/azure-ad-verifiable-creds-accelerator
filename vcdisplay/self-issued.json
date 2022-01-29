@@ -1,0 +1,31 @@
+{
+    "default": {
+      "locale": "en-US",
+      "card": {
+        "title": "Festive Azure Attendee",
+        "issuedBy": " ",
+        "backgroundColor": "#FFFFFF",
+        "textColor": "#FF0000",
+        "logo": {
+          "uri": "https://festiveaadvcstg.blob.core.windows.net/vc-general-files/christmas-tree.png",
+          "description": "Festive Christmas Tree"
+        },
+        "description": "This verifiable credential is issued as part of the azure festive season"
+      },
+      "consent": {
+        "title": "Do you want to get your verifiable credential from Arinco Demo?",
+        "instructions": "Merry Christmas!"
+      },
+      "claims": {
+        "vc.credentialSubject.firstName": {
+          "type": "String",
+          "label": "First name"
+        },
+        "vc.credentialSubject.lastName": {
+          "type": "String",
+          "label": "Last name"
+        }
+      }
+    }
+  }
+  
