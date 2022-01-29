@@ -14,6 +14,7 @@ resource "azurerm_storage_account" "vc_storage_account" {
   location                 = var.default_location
   account_tier             = "Standard"
   account_replication_type = "GRS"
+  allow_blob_public_access = true
 }
 
 resource "azurerm_storage_container" "vc_storage_containers" {
@@ -21,7 +22,6 @@ resource "azurerm_storage_container" "vc_storage_containers" {
   name                     = each.value
   storage_account_name     = azurerm_storage_account.vc_storage_account.name
   container_access_type    = "private"
-  allow_blob_public_access = true
 }
 
 resource "azurerm_key_vault" "vc_key_vault" {
